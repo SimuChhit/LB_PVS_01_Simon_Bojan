@@ -1,7 +1,38 @@
 version: '3.8'
 
 services:
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"    # Standard RabbitMQ Port (für Producer/Consumer)
+      - "15672:15672"  # Management UI Port (zur Überwachung)
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: user
+
+  # Producer (Stock-Publisher)
   stock-publisher:
     image: towak/stock-publisher:latest
     container_name: stock-publisher
     restart: always
+    environment:
+      RABBITMQ_HOST: rabbitmq  # RabbitMQ wird über den Service-Namen referenziert
+      RABBITMQ_PORT: 5672       # Standard RabbitMQ Port
+    depends_on:
+      - rabbitmq
+
+  # Consumer (Einfaches Python-Skript)
+  consumer:
+    image: python:3.11-alpine
+    container_name: consumer
+    volumes:
+      - ./consumer:/app  # Verknüpfe das lokale Verzeichnis für den Consumer-Code
+    working_dir: /app
+    command: python consumer.py
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
