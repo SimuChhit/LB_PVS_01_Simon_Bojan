@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  stock-publisher:
+    image: towak/stock-publisher:latest
+    container_name: stock-publisher
+    restart: always

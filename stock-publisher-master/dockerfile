@@ -1,0 +1,19 @@
+# Verwende das offizielle Golang-Image als Basis
+FROM golang:1.22.2
+
+# Setze den Arbeitsverzeichnis im Container
+WORKDIR /app
+
+# Kopiere die Go-Moduldateien und installiere Abhängigkeiten
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+
+# Kopiere den Rest des Codes
+COPY . .
+
+# Baue die Go-Applikation
+RUN go build -o /stock-publisher
+
+# Definiere den Befehl, der ausgeführt wird, wenn der Container gestartet wird
+CMD ["/stock-publisher"]
