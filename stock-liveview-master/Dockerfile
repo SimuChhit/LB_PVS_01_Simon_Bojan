@@ -1,17 +1,23 @@
 # Use the official Node.js image as the base image
 FROM node:22
 
-# Set the working directory inside the container
-WORKDIR ...
+# Arbeitsverzeichnis im Container erstellen und setzen
+WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the container
-COPY ...
+# Kopiere die package.json und package-lock.json (falls vorhanden)
+COPY package*.json ./
 
-# Install the dependencies
-RUN ...
+# Installiere die Abhängigkeiten
+RUN npm install
 
-# Copy the source code to the container
-COPY ...
+# Kopiere den Rest der Applikation ins Arbeitsverzeichnis
+COPY . .
 
-# Start the server when the container starts
+# Setze die Umgebungsvariable für den Port
+ENV PORT=3000
+
+# Exponiere den Port, auf dem die App läuft
+EXPOSE 3000
+
+# Startbefehl für die Anwendung
 CMD ["node", "app.js"]
