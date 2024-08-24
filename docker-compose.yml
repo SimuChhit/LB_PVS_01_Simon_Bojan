@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # RabbitMQ Message Broker
   rabbitmq:
@@ -11,6 +9,59 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: user
+
+  # MongoDB als ReplicaSet Cluster
+  mongodb0:
+    image: mongo:4.4
+    container_name: mongodb0
+    command: --replSet rs0 --bind_ip_all
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-data/db0:/data/db
+    networks:
+      - mongo-cluster
+
+  mongodb1:
+    image: mongo:4.4
+    container_name: mongodb1
+    command: --replSet rs0 --bind_ip_all
+    volumes:
+      - ./mongo-data/db1:/data/db
+    networks:
+      - mongo-cluster
+
+  mongodb2:
+    image: mongo:4.4
+    container_name: mongodb2
+    command: --replSet rs0 --bind_ip_all
+    volumes:
+      - ./mongo-data/db2:/data/db
+    networks:
+      - mongo-cluster
+
+  # Initialisieren des ReplicaSets
+  mongo-setup:
+    image: mongo:4.4
+    container_name: mongo-setup
+    depends_on:
+      - mongodb0
+      - mongodb1
+      - mongodb2
+    networks:
+      - mongo-cluster
+    command: >
+      bash -c "sleep 10 && 
+      mongo --host mongodb0:27017 <<EOF
+        rs.initiate({
+          _id: 'rs0',
+          members: [
+            { _id: 0, host: 'mongodb0:27017' },
+            { _id: 1, host: 'mongodb1:27017' },
+            { _id: 2, host: 'mongodb2:27017' }
+          ]
+        })
+        EOF"
 
   # Producer (Stock-Publisher)
   stock-publisher:
@@ -33,6 +84,16 @@ services:
     command: python consumer.py
     depends_on:
       - rabbitmq
+      - mongodb0
+      - mongodb1
+      - mongodb2
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
+      MONGODB_URI: mongodb://mongodb0:27017,mongodb1:27017,mongodb2:27017/?replicaSet=rs0
+      MONGODB_DATABASE: finance
+      MONGODB_COLLECTION: averages
+
+networks:
+  mongo-cluster:
+    driver: bridge
