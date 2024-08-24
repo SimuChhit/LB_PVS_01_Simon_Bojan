@@ -1,3 +1,4 @@
+import json
 import pika
 import os
 import pymongo
@@ -23,3 +24,31 @@ mongodb_collection = os.getenv('MONGODB_COLLECTION', 'averages')
 client = pymongo.MongoClient(mongodb_uri)
 db = client[mongodb_database]
 collection = db[mongodb_collection]
+
+batch_size = 1000
+buffer = []
+
+def process_batch(messages):
+    # Extrahieren der Preise aus den Nachrichten und den Durchschnitt berechnen
+    prices = [json.loads(message)['price'] for message in messages]
+    average_price = mean(prices)
+
+    # Das Ergebnis in die MongoDB speichern
+    collection.insert_one({'average_price': average_price})
+    print(f"Processed batch with average price: {average_price}")
+
+def callback(ch, method, properties, body):
+    global buffer
+    buffer.append(body.decode('utf-8'))
+
+    if len(buffer) >= batch_size:
+        process_batch(buffer)
+        buffer = []
+
+# Nachrichten aus der Warteschlange konsumieren
+channel.basic_consume(
+    queue=rabbitmq_queue, on_message_callback=callback, auto_ack=True
+)
+
+print('Waiting for messages. To exit press CTRL+C')
+channel.start_consuming()
