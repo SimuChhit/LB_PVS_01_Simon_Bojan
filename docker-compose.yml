@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   # RabbitMQ Message Broker
   rabbitmq:
@@ -10,90 +12,101 @@ services:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: user
 
-  # MongoDB als ReplicaSet Cluster
-  mongodb0:
+  # MongoDB Instances
+  mongo1:
     image: mongo:4.4
-    container_name: mongodb0
-    command: --replSet rs0 --bind_ip_all
+    container_name: mongo1
     ports:
       - "27017:27017"
-    volumes:
-      - ./mongo-data/db0:/data/db
-    networks:
-      - mongo-cluster
-
-  mongodb1:
-    image: mongo:4.4
-    container_name: mongodb1
     command: --replSet rs0 --bind_ip_all
-    volumes:
-      - ./mongo-data/db1:/data/db
     networks:
-      - mongo-cluster
+      - mongo_cluster
 
-  mongodb2:
+  mongo2:
     image: mongo:4.4
-    container_name: mongodb2
+    container_name: mongo2
     command: --replSet rs0 --bind_ip_all
-    volumes:
-      - ./mongo-data/db2:/data/db
     networks:
-      - mongo-cluster
+      - mongo_cluster
 
-  # Initialisieren des ReplicaSets
-  mongo-setup:
+  mongo3:
     image: mongo:4.4
-    container_name: mongo-setup
-    depends_on:
-      - mongodb0
-      - mongodb1
-      - mongodb2
+    container_name: mongo3
+    command: --replSet rs0 --bind_ip_all
     networks:
-      - mongo-cluster
-    command: >
-      bash -c "sleep 10 && 
-      mongo --host mongodb0:27017 <<EOF
-        rs.initiate({
-          _id: 'rs0',
-          members: [
-            { _id: 0, host: 'mongodb0:27017' },
-            { _id: 1, host: 'mongodb1:27017' },
-            { _id: 2, host: 'mongodb2:27017' }
-          ]
-        })
-        EOF"
+      - mongo_cluster
 
-  # Producer (Stock-Publisher)
-  stock-publisher:
-    image: towak/stock-publisher:latest
-    container_name: stock-publisher
-    restart: always
-    environment:
-      RABBITMQ_HOST: rabbitmq  # RabbitMQ wird über den Service-Namen referenziert
-      RABBITMQ_PORT: 5672       # Standard RabbitMQ Port
-    depends_on:
-      - rabbitmq
-
-  # Consumer (Einfaches Python-Skript)
-  consumer:
-    image: python:3.11-alpine
-    container_name: consumer
-    volumes:
-      - ./consumer:/app  # Verknüpfe das lokale Verzeichnis für den Consumer-Code
-    working_dir: /app
-    command: python consumer.py
-    depends_on:
-      - rabbitmq
-      - mongodb0
-      - mongodb1
-      - mongodb2
+  # Consumer für MSFT
+  consumer-msft:
+    image: simonchhit/consumer:latest
+    container_name: consumer-msft
     environment:
       RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: 5672
-      MONGODB_URI: mongodb://mongodb0:27017,mongodb1:27017,mongodb2:27017/?replicaSet=rs0
+      RABBITMQ_QUEUE: MSFT
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
       MONGODB_DATABASE: finance
-      MONGODB_COLLECTION: averages
+      MONGODB_COLLECTION: aggregated_prices
+    depends_on:
+      - rabbitmq
+      - mongo1
+      - mongo2
+      - mongo3
+    networks:
+      - mongo_cluster
+
+  # Consumer für TSLA
+  consumer-tsla:
+    image: simonchhit/consumer:latest
+    container_name: consumer-tsla
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_QUEUE: TSLA
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
+      MONGODB_DATABASE: finance
+      MONGODB_COLLECTION: aggregated_prices
+    depends_on:
+      - rabbitmq
+      - mongo1
+      - mongo2
+      - mongo3
+    networks:
+      - mongo_cluster
+
+  # Consumer für AAPL
+  consumer-aapl:
+    image: simonchhit/consumer:latest
+    container_name: consumer-aapl
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_QUEUE: AAPL
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
+      MONGODB_DATABASE: finance
+      MONGODB_COLLECTION: aggregated_prices
+    depends_on:
+      - rabbitmq
+      - mongo1
+      - mongo2
+      - mongo3
+    networks:
+      - mongo_cluster
+
+  # Frontend
+  frontend:
+    image: simonchhit/frontend:latest
+    container_name: frontend
+    ports:
+      - "80:80"
+    environment:
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
+      MONGODB_DATABASE: finance
+      MONGODB_COLLECTION: aggregated_prices
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    networks:
+      - mongo_cluster
 
 networks:
-  mongo-cluster:
+  mongo_cluster:
     driver: bridge
