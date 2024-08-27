@@ -1,0 +1,17 @@
+# Dockerfile-tsla für Kunde B
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY . .
+
+RUN pip install -r requirements.txt
+
+ENV MONGODB_URI=mongodb://localhost:27017
+ENV MONGODB_DATABASE=finance
+ENV MONGODB_COLLECTION=aggregated_tsla
+ENV RABBITMQ_HOST=localhost
+ENV RABBITMQ_QUEUE=TSLA
+ENV BATCH_SIZE=1000
+
+CMD ["python", "consumer.py"]

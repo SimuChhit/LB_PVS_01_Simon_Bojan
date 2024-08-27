@@ -39,7 +39,7 @@ services:
   # Consumer für MSFT
   consumer-msft:
     image: simonchhit/consumer:latest
-    container_name: consumer-msft
+    container_name: consumerMFST-msft
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_QUEUE: MSFT
@@ -57,7 +57,7 @@ services:
   # Consumer für TSLA
   consumer-tsla:
     image: simonchhit/consumer:latest
-    container_name: consumer-tsla
+    container_name: consumerMFST-tsla
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_QUEUE: TSLA
@@ -75,7 +75,7 @@ services:
   # Consumer für AAPL
   consumer-aapl:
     image: simonchhit/consumer:latest
-    container_name: consumer-aapl
+    container_name: consumerMFST-aapl
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_QUEUE: AAPL

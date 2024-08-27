@@ -14,7 +14,7 @@ collection = db[mongodb_collection]
 
 # RabbitMQ-Einstellungen
 rabbitmq_host = os.getenv('RABBITMQ_HOST', 'localhost')
-rabbitmq_queue = os.getenv('RABBITMQ_QUEUE', 'MSFT')  # Default: MSFT Queue
+rabbitmq_queue = os.getenv('RABBITMQ_QUEUE', 'MSFT')
 
 # Verbindung zu RabbitMQ herstellen
 connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host))
