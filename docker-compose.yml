@@ -74,7 +74,7 @@ services:
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_QUEUE: TSLA
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
       MONGODB_DATABASE: finance
       MONGODB_COLLECTION: aggregated_prices
     depends_on:
@@ -92,7 +92,26 @@ services:
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_QUEUE: AAPL
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      MONGODB_DATABASE: finance
+      MONGODB_COLLECTION: aggregated_prices
+    depends_on:
+      - rabbitmq
+      - mongo1
+      - mongo2
+      - mongo3
+    networks:
+      - mongo_cluster
+
+
+  # Consumer für MFST
+  consumer-mfst:
+    image: simonchhit/consumer:latest
+    container_name: consumer-mfst
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_QUEUE: MFST
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
       MONGODB_DATABASE: finance
       MONGODB_COLLECTION: aggregated_prices
     depends_on:
