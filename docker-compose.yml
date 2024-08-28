@@ -12,8 +12,7 @@ services:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: user
 
-  # MongoDB Instances
-  services:
+  # MongoDB Instanzen
   mongo1:
     image: mongo:7.0
     container_name: mongo1
@@ -60,14 +59,6 @@ services:
       - "mongo3_data:/data/db"
       - "mongo3_config:/data/configdb"
  
-volumes:
-  mongo1_data:
-  mongo1_config:
-  mongo2_data:
-  mongo2_config:
-  mongo3_data:
-  mongo3_config:
-
   # Consumer für TSLA
   consumer-tsla:
     image: simonchhit/consumer:latest
@@ -120,6 +111,14 @@ volumes:
       - mongo3
     networks:
       - mongo_cluster
+
+volumes:
+  mongo1_data:
+  mongo1_config:
+  mongo2_data:
+  mongo2_config:
+  mongo3_data:
+  mongo3_config:
 
 networks:
   mongo_cluster:
