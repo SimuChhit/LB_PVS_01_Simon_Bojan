@@ -13,46 +13,60 @@ services:
       RABBITMQ_DEFAULT_PASS: user
 
   # MongoDB Instances
+  services:
   mongo1:
-    image: mongo:4.4
+    image: mongo:7.0
     container_name: mongo1
+    restart: always
     ports:
-      - "27017:27017"
-    command: --replSet rs0 --bind_ip_all
-    networks:
-      - mongo_cluster
-
+      - 27017:27017
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - "mongo1_data:/data/db"
+      - "mongo1_config:/data/configdb"
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017',priority:1},{_id:1,host:'host.docker.internal:27018',priority:0.5},{_id:2,host:'host.docker.internal:27019',priority:0.5}]}) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 30
+ 
   mongo2:
-    image: mongo:4.4
+    image: mongo:7.0
     container_name: mongo2
-    command: --replSet rs0 --bind_ip_all
-    networks:
-      - mongo_cluster
-
+    restart: always
+    ports:
+      - 27018:27017
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - "mongo2_data:/data/db"
+      - "mongo2_config:/data/configdb"
+ 
   mongo3:
-    image: mongo:4.4
+    image: mongo:7.0
     container_name: mongo3
-    command: --replSet rs0 --bind_ip_all
-    networks:
-      - mongo_cluster
-
-  # Consumer für MSFT
-  consumer-msft:
-    image: simonchhit/consumer:latest
-    container_name: consumerMFST-msft
-    environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_QUEUE: MSFT
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
-      MONGODB_DATABASE: finance
-      MONGODB_COLLECTION: aggregated_prices
-    depends_on:
-      - rabbitmq
-      - mongo1
-      - mongo2
-      - mongo3
-    networks:
-      - mongo_cluster
+    restart: always
+    ports:
+      - 27019:27017
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - "mongo3_data:/data/db"
+      - "mongo3_config:/data/configdb"
+ 
+volumes:
+  mongo1_data:
+  mongo1_config:
+  mongo2_data:
+  mongo2_config:
+  mongo3_data:
+  mongo3_config:
 
   # Consumer für TSLA
   consumer-tsla:
