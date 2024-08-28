@@ -6,6 +6,8 @@ services:
     image: towak/stock-publisher:latest
     container_name: stock-publisher
     restart: always
+    environment:
+      - RABBITMQ_URL=amqp://user:user@rabbitmq:5672/
 
   # RabbitMQ Message Broker
   rabbitmq:
