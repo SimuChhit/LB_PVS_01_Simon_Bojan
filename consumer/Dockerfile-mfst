@@ -7,7 +7,7 @@ COPY . .
 
 RUN pip install -r requirements.txt
 
-ENV MONGODB_URI=mongodb://localhost:27017
+ENV MONGODB_URI=mongodb://localhost:27018
 ENV MONGODB_DATABASE=finance
 ENV MONGODB_COLLECTION=aggregated_msft
 ENV RABBITMQ_HOST=localhost

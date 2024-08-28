@@ -70,7 +70,7 @@ services:
   # Consumer für TSLA
   consumer-tsla:
     image: simonchhit/consumer:latest
-    container_name: consumerMFST-tsla
+    container_name: consumer-tsla
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_QUEUE: TSLA
@@ -88,7 +88,7 @@ services:
   # Consumer für AAPL
   consumer-aapl:
     image: simonchhit/consumer:latest
-    container_name: consumerMFST-aapl
+    container_name: consumer-aapl
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_QUEUE: AAPL
