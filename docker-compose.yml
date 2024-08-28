@@ -129,7 +129,7 @@ services:
     ports:
       - "80:80"
     environment:
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27017,mongo3:27017/?replicaSet=rs0
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
       MONGODB_DATABASE: finance
       MONGODB_COLLECTION: aggregated_prices
     depends_on:
