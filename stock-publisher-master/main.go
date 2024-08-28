@@ -90,7 +90,7 @@ func getEnvWithDefault(key, fallback string) string {
 }
 
 func main() {
-	rabbitMQConnectionString := getEnvWithDefault("RABBITMQ_URL", "amqp://stockmarket:supersecret123@localhost:5672/")
+	rabbitMQConnectionString := getEnvWithDefault("RABBITMQ_URL", "amqp://user:user@localhost:5672/")
 
 	conn, err := amqp.Dial(rabbitMQConnectionString)
 
