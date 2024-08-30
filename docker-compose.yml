@@ -103,7 +103,6 @@ services:
     networks:
       - mongo_cluster
 
-
   # Consumer für MFST
   consumer-mfst:
     image: simonchhit/consumer:latest
@@ -132,6 +131,8 @@ services:
       MONGODB_COLLECTION: aggregated_prices
     networks:
       - mongo_cluster
+    expose:
+      - "3000"  # Expose port 3000 for communication with NGINX
 
   frontend2:
     image: towak/stock-liveview:latest
@@ -142,6 +143,8 @@ services:
       MONGODB_COLLECTION: aggregated_prices
     networks:
       - mongo_cluster
+    expose:
+      - "3000"  # Expose port 3000 for communication with NGINX
 
   nginx:
     image: nginx:latest
@@ -167,5 +170,3 @@ volumes:
 networks:
   mongo_cluster:
     driver: bridge
-
-    #Test
