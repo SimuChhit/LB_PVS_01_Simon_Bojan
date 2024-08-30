@@ -124,10 +124,10 @@ services:
 
   # Frontend
   frontend:
-    image: simonchhit/frontend:latest
+    image: towak/stock-liveview:latest
     container_name: frontend
     ports:
-      - "8080:80"
+      - "3000:3000"
     environment:
       MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
       MONGODB_DATABASE: finance
