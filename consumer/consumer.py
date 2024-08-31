@@ -2,11 +2,12 @@ import os
 import pika
 import pymongo
 import json
+import time
 
 # MongoDB-Einstellungen
 mongodb_uri = os.getenv('MONGODB_URI', 'mongodb://localhost:27017')
-mongodb_database = os.getenv('MONGODB_DATABASE', 'finance')
-mongodb_collection = os.getenv('MONGODB_COLLECTION', 'aggregated_prices')
+mongodb_database = os.getenv('MONGODB_DATABASE', 'stockmarket')  # Name der Datenbank ist 'stockmarket'
+mongodb_collection = os.getenv('MONGODB_COLLECTION', 'stock')  # Collection heißt 'stocks'
 
 client = pymongo.MongoClient(mongodb_uri)
 db = client[mongodb_database]
@@ -30,9 +31,7 @@ def process_batch(buffer):
     average_price = sum(prices) / len(prices)
     result = {
         "company": rabbitmq_queue,
-        "average_price": average_price,
-        "count": len(prices),
-        "timestamp": time.time(),
+        "avgPrice": average_price,  # Feldname gemäß Schema 'avgPrice'
     }
     collection.insert_one(result)
     print(f"Processed {len(prices)} messages from {rabbitmq_queue}, average price: {average_price}")
