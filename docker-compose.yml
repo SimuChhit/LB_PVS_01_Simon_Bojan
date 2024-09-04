@@ -83,8 +83,8 @@ services:
       RABBITMQ_USER: user
       RABBITMQ_PASS: user
       MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
-      MONGODB_DATABASE: finance
-      MONGODB_COLLECTION: aggregated_prices
+      MONGODB_DATABASE: stockmarket
+      MONGODB_COLLECTION: stock
     depends_on:
       - rabbitmq
       - mongo1
@@ -103,8 +103,8 @@ services:
       RABBITMQ_USER: user
       RABBITMQ_PASS: user
       MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
-      MONGODB_DATABASE: finance
-      MONGODB_COLLECTION: aggregated_prices
+      MONGODB_DATABASE: stockmarket
+      MONGODB_COLLECTION: stock
     depends_on:
       - rabbitmq
       - mongo1
@@ -123,8 +123,8 @@ services:
       RABBITMQ_USER: user
       RABBITMQ_PASS: user
       MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
-      MONGODB_DATABASE: finance
-      MONGODB_COLLECTION: aggregated_prices
+      MONGODB_DATABASE: stockmarket
+      MONGODB_COLLECTION: stock
     depends_on:
       - rabbitmq
       - mongo1
@@ -138,8 +138,8 @@ services:
     container_name: frontend1
     environment:
       MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
-      MONGODB_DATABASE: finance
-      MONGODB_COLLECTION: aggregated_prices
+      MONGODB_DATABASE: stockmarket
+      MONGODB_COLLECTION: stock
     networks:
       - mongo_cluster
     expose:
@@ -150,8 +150,8 @@ services:
     container_name: frontend2
     environment:
       MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
-      MONGODB_DATABASE: finance
-      MONGODB_COLLECTION: aggregated_prices
+      MONGODB_DATABASE: stockmarket
+      MONGODB_COLLECTION: stock
     networks:
       - mongo_cluster
     expose:
