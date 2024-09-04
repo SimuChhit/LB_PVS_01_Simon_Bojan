@@ -1,180 +1,180 @@
-version: '3.8'  # Version des Docker Compose-Formats
+version: '3.8'
 
 services:
   stock-publisher:
-    image: towak/stock-publisher:latest  # Docker-Image für den Stock Publisher
-    container_name: stock-publisher  # Name des Containers
-    restart: always  # Container immer neu starten, falls er abstürzt
+    image: towak/stock-publisher:latest
+    container_name: stock-publisher
+    restart: always
     environment:
-      - RABBITMQ_URL=amqp://user:user@rabbitmq:5672/  # RabbitMQ-Verbindungs-URL
+      - RABBITMQ_URL=amqp://user:user@rabbitmq:5672/
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
 
   rabbitmq:
-    image: rabbitmq:3-management  # Docker-Image für RabbitMQ mit Management-Plugin
-    container_name: rabbitmq  # Name des Containers
+    image: rabbitmq:3-management
+    container_name: rabbitmq
     ports:
-      - "5672:5672"  # Port für AMQP
-      - "15672:15672"  # Port für RabbitMQ Management UI
+      - "5672:5672"
+      - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: user  # Standardbenutzername für RabbitMQ
-      RABBITMQ_DEFAULT_PASS: user  # Standardpasswort für RabbitMQ
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: user
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
 
   mongo1:
-    image: mongo:7.0  # Docker-Image für MongoDB
-    container_name: mongo1  # Name des Containers
-    restart: always  # Container immer neu starten, falls er abstürzt
+    image: mongo:7.0
+    container_name: mongo1
+    restart: always
     ports:
-      - 27017:27017  # Port für MongoDB
-    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27017"]  # MongoDB-Kommando zur Initialisierung des Replikat-Sets
+      - 27017:27017
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
     extra_hosts:
-      - "host.docker.internal:host-gateway"  # Ermöglicht den Zugriff auf den Host
+      - "host.docker.internal:host-gateway"
     volumes:
-      - "mongo1_data:/data/db"  # Datenvolumen für MongoDB-Daten
-      - "mongo1_config:/data/configdb"  # Datenvolumen für MongoDB-Konfigurationsdaten
+      - "mongo1_data:/data/db"
+      - "mongo1_config:/data/configdb"
     healthcheck:
-      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017',priority:1},{_id:1,host:'host.docker.internal:27018',priority:0.5},{_id:2,host:'host.docker.internal:27019',priority:0.5}]}) }" | mongosh --port 27017 --quiet  # Healthcheck-Kommando zur Überprüfung des Replikat-Sets
-      interval: 5s  # Intervall zwischen den Healthchecks
-      timeout: 30s  # Timeout für den Healthcheck
-      start_period: 0s  # Startperiode für den Healthcheck
-      retries: 30  # Anzahl der Wiederholungen für den Healthcheck
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'host.docker.internal:27017',priority:1},{_id:1,host:'host.docker.internal:27018',priority:0.5},{_id:2,host:'host.docker.internal:27019',priority:0.5}]}) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      retries: 30
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
 
   mongo2:
-    image: mongo:7.0  # Docker-Image für MongoDB
-    container_name: mongo2  # Name des Containers
-    restart: always  # Container immer neu starten, falls er abstürzt
+    image: mongo:7.0
+    container_name: mongo2
+    restart: always
     ports:
-      - 27018:27017  # Port für MongoDB
-    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27017"]  # MongoDB-Kommando zur Initialisierung des Replikat-Sets
+      - 27018:27017
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
     extra_hosts:
-      - "host.docker.internal:host-gateway"  # Ermöglicht den Zugriff auf den Host
+      - "host.docker.internal:host-gateway"
     volumes:
-      - "mongo2_data:/data/db"  # Datenvolumen für MongoDB-Daten
-      - "mongo2_config:/data/configdb"  # Datenvolumen für MongoDB-Konfigurationsdaten
+      - "mongo2_data:/data/db"
+      - "mongo2_config:/data/configdb"
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
 
   mongo3:
-    image: mongo:7.0  # Docker-Image für MongoDB
-    container_name: mongo3  # Name des Containers
-    restart: always  # Container immer neu starten, falls er abstürzt
+    image: mongo:7.0
+    container_name: mongo3
+    restart: always
     ports:
-      - 27019:27017  # Port für MongoDB
-    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27017"]  # MongoDB-Kommando zur Initialisierung des Replikat-Sets
+      - 27019:27017
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
     extra_hosts:
-      - "host.docker.internal:host-gateway"  # Ermöglicht den Zugriff auf den Host
+      - "host.docker.internal:host-gateway"
     volumes:
-      - "mongo3_data:/data/db"  # Datenvolumen für MongoDB-Daten
-      - "mongo3_config:/data/configdb"  # Datenvolumen für MongoDB-Konfigurationsdaten
+      - "mongo3_data:/data/db"
+      - "mongo3_config:/data/configdb"
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
 
   consumer-tsla:
-    image: simonchhit/consumer:latest  # Docker-Image für den TSLA-Consumer
-    container_name: consumer-tsla  # Name des Containers
+    image: simonchhit/consumer-leistungsnachweis:latest
+    container_name: consumer-tsla
     environment:
-      RABBITMQ_HOST: rabbitmq  # RabbitMQ-Host
-      RABBITMQ_QUEUE: TSLA  # RabbitMQ-Warteschlange
-      RABBITMQ_USER: user  # RabbitMQ-Benutzername
-      RABBITMQ_PASS: user  # RabbitMQ-Passwort
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0  # MongoDB-URI für das Replikat-Set
-      MONGODB_DATABASE: finance  # Name der MongoDB-Datenbank
-      MONGODB_COLLECTION: aggregated_prices  # Name der MongoDB-Sammlung
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_QUEUE: TSLA
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: user
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      MONGODB_DATABASE: finance
+      MONGODB_COLLECTION: aggregated_prices
     depends_on:
-      - rabbitmq  # Abhängigkeit von RabbitMQ
-      - mongo1  # Abhängigkeit von MongoDB-Instanz 1
-      - mongo2  # Abhängigkeit von MongoDB-Instanz 2
-      - mongo3  # Abhängigkeit von MongoDB-Instanz 3
+      - rabbitmq
+      - mongo1
+      - mongo2
+      - mongo3
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
 
   consumer-aapl:
-    image: simonchhit/consumer:latest  # Docker-Image für den AAPL-Consumer
-    container_name: consumer-aapl  # Name des Containers
+    image: simonchhit/consumer-leistungsnachweis:latest
+    container_name: consumer-aapl
     environment:
-      RABBITMQ_HOST: rabbitmq  # RabbitMQ-Host
-      RABBITMQ_QUEUE: AAPL  # RabbitMQ-Warteschlange
-      RABBITMQ_USER: user  # RabbitMQ-Benutzername
-      RABBITMQ_PASS: user  # RabbitMQ-Passwort
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0  # MongoDB-URI für das Replikat-Set
-      MONGODB_DATABASE: finance  # Name der MongoDB-Datenbank
-      MONGODB_COLLECTION: aggregated_prices  # Name der MongoDB-Sammlung
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_QUEUE: AAPL
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: user
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      MONGODB_DATABASE: finance
+      MONGODB_COLLECTION: aggregated_prices
     depends_on:
-      - rabbitmq  # Abhängigkeit von RabbitMQ
-      - mongo1  # Abhängigkeit von MongoDB-Instanz 1
-      - mongo2  # Abhängigkeit von MongoDB-Instanz 2
-      - mongo3  # Abhängigkeit von MongoDB-Instanz 3
+      - rabbitmq
+      - mongo1
+      - mongo2
+      - mongo3
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
 
   consumer-msft:
-    image: simonchhit/consumer:latest  # Docker-Image für den MSFT-Consumer
-    container_name: consumer-msft  # Name des Containers
+    image: simonchhit/consumer-leistungsnachweis:latest
+    container_name: consumer-msft
     environment:
-      RABBITMQ_HOST: rabbitmq  # RabbitMQ-Host
-      RABBITMQ_QUEUE: MSFT  # RabbitMQ-Warteschlange
-      RABBITMQ_USER: user  # RabbitMQ-Benutzername
-      RABBITMQ_PASS: user  # RabbitMQ-Passwort
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0  # MongoDB-URI für das Replikat-Set
-      MONGODB_DATABASE: finance  # Name der MongoDB-Datenbank
-      MONGODB_COLLECTION: aggregated_prices  # Name der MongoDB-Sammlung
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_QUEUE: MSFT
+      RABBITMQ_USER: user
+      RABBITMQ_PASS: user
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      MONGODB_DATABASE: finance
+      MONGODB_COLLECTION: aggregated_prices
     depends_on:
-      - rabbitmq  # Abhängigkeit von RabbitMQ
-      - mongo1  # Abhängigkeit von MongoDB-Instanz 1
-      - mongo2  # Abhängigkeit von MongoDB-Instanz 2
-      - mongo3  # Abhängigkeit von MongoDB-Instanz 3
+      - rabbitmq
+      - mongo1
+      - mongo2
+      - mongo3
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
 
   frontend1:
-    image: towak/stock-liveview:latest  # Docker-Image für das Frontend
-    container_name: frontend1  # Name des Containers
+    image: towak/stock-liveview:latest
+    container_name: frontend1
     environment:
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0  # MongoDB-URI für das Replikat-Set
-      MONGODB_DATABASE: finance  # Name der MongoDB-Datenbank
-      MONGODB_COLLECTION: aggregated_prices  # Name der MongoDB-Sammlung
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      MONGODB_DATABASE: finance
+      MONGODB_COLLECTION: aggregated_prices
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
     expose:
-      - "3000"  # Port, der vom Container freigegeben wird
+      - "3000"
 
   frontend2:
-    image: towak/stock-liveview:latest  # Docker-Image für das Frontend
-    container_name: frontend2  # Name des Containers
+    image: towak/stock-liveview:latest
+    container_name: frontend2
     environment:
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0  # MongoDB-URI für das Replikat-Set
-      MONGODB_DATABASE: finance  # Name der MongoDB-Datenbank
-      MONGODB_COLLECTION: aggregated_prices  # Name der MongoDB-Sammlung
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      MONGODB_DATABASE: finance
+      MONGODB_COLLECTION: aggregated_prices
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
     expose:
-      - "3000"  # Port, der vom Container freigegeben wird
+      - "3000"
 
   nginx:
-    image: nginx:latest  # Docker-Image für Nginx
-    container_name: nginx-loadbalancer  # Name des Containers
+    image: nginx:latest
+    container_name: nginx-loadbalancer
     ports:
-      - "3000:80"  # Port-Mapping für Nginx
+      - "3000:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro  # Nginx-Konfigurationsdatei
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - frontend1  # Abhängigkeit von Frontend1
-      - frontend2  # Abhängigkeit von Frontend2
+      - frontend1
+      - frontend2
     networks:
-      - mongo_cluster  # Netzwerk, in dem der Dienst läuft
+      - mongo_cluster
 
 volumes:
-  mongo1_data:  # Datenvolumen für MongoDB-Instanz 1
-  mongo1_config:  # Konfigurationsvolumen für MongoDB-Instanz 1
-  mongo2_data:  # Datenvolumen für MongoDB-Instanz 2
-  mongo2_config:  # Konfigurationsvolumen für MongoDB-Instanz 2
-  mongo3_data:  # Datenvolumen für MongoDB-Instanz 3
-  mongo3_config:  # Konfigurationsvolumen für MongoDB-Instanz 3
+  mongo1_data:
+  mongo1_config:
+  mongo2_data:
+  mongo2_config:
+  mongo3_data:
+  mongo3_config:
 
 networks:
   mongo_cluster:
-    driver: bridge  # Netzwerk-Treiber für das MongoDB-Cluster-Netzwerk
+    driver: bridge
