@@ -1,24 +1,27 @@
-services:
+version: '3.8'
 
+services:
   stock-publisher:
     image: towak/stock-publisher:latest
     container_name: stock-publisher
     restart: always
     environment:
       - RABBITMQ_URL=amqp://user:user@rabbitmq:5672/
+    networks:
+      - mongo_cluster
 
-  # RabbitMQ Message Broker
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"    # Standard RabbitMQ Port (für Producer/Consumer)
-      - "15672:15672"  # Management UI Port (zur Überwachung)
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: user
+    networks:
+      - mongo_cluster
 
-  # MongoDB Instanzen
   mongo1:
     image: mongo:7.0
     container_name: mongo1
@@ -37,7 +40,9 @@ services:
       timeout: 30s
       start_period: 0s
       retries: 30
- 
+    networks:
+      - mongo_cluster
+
   mongo2:
     image: mongo:7.0
     container_name: mongo2
@@ -50,7 +55,9 @@ services:
     volumes:
       - "mongo2_data:/data/db"
       - "mongo2_config:/data/configdb"
- 
+    networks:
+      - mongo_cluster
+
   mongo3:
     image: mongo:7.0
     container_name: mongo3
@@ -63,8 +70,9 @@ services:
     volumes:
       - "mongo3_data:/data/db"
       - "mongo3_config:/data/configdb"
- 
-  # Consumer für TSLA
+    networks:
+      - mongo_cluster
+
   consumer-tsla:
     image: simonchhit/consumer:latest
     container_name: consumer-tsla
@@ -82,7 +90,6 @@ services:
     networks:
       - mongo_cluster
 
-  # Consumer für AAPL
   consumer-aapl:
     image: simonchhit/consumer:latest
     container_name: consumer-aapl
@@ -100,8 +107,7 @@ services:
     networks:
       - mongo_cluster
 
-  # Consumer für MFST
-  consumer-mfst:
+  consumer-msft:
     image: simonchhit/consumer:latest
     container_name: consumer-msft
     environment:
@@ -118,7 +124,6 @@ services:
     networks:
       - mongo_cluster
 
-  # Frontend
   frontend1:
     image: towak/stock-liveview:latest
     container_name: frontend1
@@ -129,7 +134,7 @@ services:
     networks:
       - mongo_cluster
     expose:
-      - "3000"  # Expose port 3000 for communication with NGINX
+      - "3000"
 
   frontend2:
     image: towak/stock-liveview:latest
@@ -141,7 +146,7 @@ services:
     networks:
       - mongo_cluster
     expose:
-      - "3000"  # Expose port 3000 for communication with NGINX
+      - "3000"
 
   nginx:
     image: nginx:latest
