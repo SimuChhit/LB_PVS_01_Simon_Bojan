@@ -7,7 +7,7 @@ import time
 # MongoDB-Einstellungen
 mongodb_uri = os.getenv('MONGODB_URI', 'mongodb://localhost:27017')
 mongodb_database = os.getenv('MONGODB_DATABASE', 'stockmarket')  # Name der Datenbank ist 'stockmarket'
-mongodb_collection = os.getenv('MONGODB_COLLECTION', 'stock')  # Collection heißt 'stocks'
+mongodb_collection = os.getenv('MONGODB_COLLECTION', 'stocks')  # Collection heißt 'stocks'
 
 client = pymongo.MongoClient(mongodb_uri)
 db = client[mongodb_database]
