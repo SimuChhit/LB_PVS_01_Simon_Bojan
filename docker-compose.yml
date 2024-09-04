@@ -74,8 +74,9 @@ services:
       - mongo_cluster
 
   consumer-tsla:
-    image: simonchhit/consumer-leistungsnachweis:latest
+    image: simonchhit/consumer:latest
     container_name: consumer-tsla
+    restart: always
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_QUEUE: TSLA
@@ -93,8 +94,9 @@ services:
       - mongo_cluster
 
   consumer-aapl:
-    image: simonchhit/consumer-leistungsnachweis:latest
+    image: simonchhit/consumer:latest
     container_name: consumer-aapl
+    restart: always
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_QUEUE: AAPL
@@ -112,8 +114,9 @@ services:
       - mongo_cluster
 
   consumer-msft:
-    image: simonchhit/consumer-leistungsnachweis:latest
+    image: simonchhit/consumer:latest
     container_name: consumer-msft
+    restart: always
     environment:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_QUEUE: MSFT

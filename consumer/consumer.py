@@ -4,7 +4,7 @@ import pymongo
 import json
 
 # MongoDB-Einstellungen
-mongodb_uri = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/')  # Achte auf den abschließenden Schrägstrich
+mongodb_uri = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/')
 mongodb_database = os.getenv('MONGODB_DATABASE', 'stockmarket')
 mongodb_collection = os.getenv('MONGODB_COLLECTION', 'stock')
 
@@ -15,9 +15,9 @@ collection = db[mongodb_collection]
 
 # RabbitMQ-Einstellungen
 rabbitmq_host = os.getenv('RABBITMQ_HOST', 'localhost')
-rabbitmq_queue = os.getenv('RABBITMQ_QUEUE', 'MSFT')
-rabbitmq_user = os.getenv('RABBITMQ_USER', 'guest')  # Standardbenutzername
-rabbitmq_pass = os.getenv('RABBITMQ_PASS', 'guest')  # Standardpasswort
+rabbitmq_queue = os.getenv('RABBITMQ_QUEUE', 'TSLA')
+rabbitmq_user = os.getenv('RABBITMQ_USER', 'user')
+rabbitmq_pass = os.getenv('RABBITMQ_PASS', 'user')
 
 # Verbindung zu RabbitMQ herstellen
 credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_pass)
