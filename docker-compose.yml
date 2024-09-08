@@ -15,7 +15,7 @@ services:
     container_name: rabbitmq
     ports:
       - "5672:5672" # AMQP
-      - "15672:15672" # Web UI
+      - "15672:15672" # Web-UI
     environment:
       RABBITMQ_DEFAULT_USER: user
       RABBITMQ_DEFAULT_PASS: user
@@ -32,8 +32,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - "mongo1_data:/data/db"
-      - "mongo1_config:/data/configdb"
+      - mongo1_data:/data/db
+      - mongo1_config:/data/configdb
     networks:
       - mongo_cluster
 
@@ -47,8 +47,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - "mongo2_data:/data/db"
-      - "mongo2_config:/data/configdb"
+      - mongo2_data:/data/db
+      - mongo2_config:/data/configdb
     networks:
       - mongo_cluster
 
@@ -62,8 +62,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - "mongo3_data:/data/db"
-      - "mongo3_config:/data/configdb"
+      - mongo3_data:/data/db
+      - mongo3_config:/data/configdb
     networks:
       - mongo_cluster
 
@@ -127,47 +127,37 @@ services:
     networks:
       - mongo_cluster
 
-  frontend1:
-    image: towak/stock-liveview:latest
-    container_name: frontend1
-    restart: always
-    environment:
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
-      MONGODB_DATABASE: stockmarket
-      MONGODB_COLLECTION: stock
-    networks:
-      - mongo_cluster
-    expose:
-      - "3000"
-    ports:
-      - "3001:3000"
-
-  frontend2:
-    image: towak/stock-liveview:latest
-    container_name: frontend2
-    restart: always
-    environment:
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
-      MONGODB_DATABASE: stockmarket
-      MONGODB_COLLECTION: stock
-    networks:
-      - mongo_cluster
-    expose:
-      - "3000"
-    ports:
-      - "3002:3000"
-
   nginx:
     image: nginx:latest
-    container_name: nginx-loadbalancer
-    restart: always
+    container_name: nginx
     ports:
       - "80:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - mongo_cluster
     depends_on:
+      - consumer-tsla
+      - consumer-aapl 
+      - consumer-msft
       - frontend1
       - frontend2
+
+  frontend1:  
+    image: simonchhit/frontend:latest
+    container_name: frontend1
+    restart: always
+    environment:
+      - REACT_APP_STOCK=MSFT
+    networks:
+      - mongo_cluster
+    
+  frontend2:  
+    image: simonchhit/frontend:latest
+    container_name: frontend2
+    restart: always
+    environment:
+      - REACT_APP_STOCK=AAPL
     networks:
       - mongo_cluster
 
