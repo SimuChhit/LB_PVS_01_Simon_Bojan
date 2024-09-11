@@ -163,7 +163,6 @@ services:
     ports:
       - "3002:3000"
 
-
   nginx:
     image: nginx:latest
     container_name: nginx-loadbalancer
