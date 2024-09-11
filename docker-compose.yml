@@ -144,23 +144,35 @@ services:
       - frontend1
       - frontend2
 
-  frontend1:  
-    image: simonchhit/frontend:latest
+  frontend1:
+    image: towak/stock-liveview:latest
     container_name: frontend1
     restart: always
     environment:
-      - REACT_APP_STOCK=MSFT
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      MONGODB_DATABASE: stockmarket
+      MONGODB_COLLECTION: stock
     networks:
       - mongo_cluster
-    
-  frontend2:  
-    image: simonchhit/frontend:latest
+    expose:
+      - "3000"
+    ports:
+      - "3001:3000"
+
+  frontend2:
+    image: towak/stock-liveview:latest
     container_name: frontend2
     restart: always
     environment:
-      - REACT_APP_STOCK=AAPL
+      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      MONGODB_DATABASE: stockmarket
+      MONGODB_COLLECTION: stock
     networks:
       - mongo_cluster
+    expose:
+      - "3000"
+    ports:
+      - "3002:3000"
 
 volumes:
   mongo1_data:
