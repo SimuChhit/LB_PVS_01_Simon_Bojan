@@ -138,30 +138,26 @@ services:
     container_name: frontend1
     restart: always
     environment:
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      MONGODB_URL: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
       MONGODB_DATABASE: stockmarket
       MONGODB_COLLECTION: stock
     networks:
       - mongo_cluster
-    expose:
-      - "3000"
     ports:
-      - "3001:3000"
+      - "8080:3000"
+
 
   frontend2:
     image: towak/stock-liveview:latest
     container_name: frontend2
     restart: always
     environment:
-      MONGODB_URI: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
+      MONGODB_URL: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs0
       MONGODB_DATABASE: stockmarket
       MONGODB_COLLECTION: stock
     networks:
       - mongo_cluster
-    expose:
-      - "3000"
-    ports:
-      - "3002:3000"
+
 
   nginx:
     image: nginx:latest
