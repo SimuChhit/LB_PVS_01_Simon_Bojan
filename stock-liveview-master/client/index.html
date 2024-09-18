@@ -5,18 +5,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stock-Liveview</title>
+    <link rel="stylesheet" href="styles.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/script.js"></script>
   </head>
-  <body
-    class="flex items-center justify-center w-screen h-screen text-gray-200 bg-slate-800"
-  >
-    <div class="flex flex-col items-center gap-2">
-      <h1 class="text-3xl font-semibold uppercase">Stock-Liveview</h1>
-      <div class="flex gap-2" id="prices">
-        <div
-          class="flex items-center justify-center w-64 h-32 p-4 text-red-400 border-4 border-red-400 border-dotted"
-        >
+  <body class="flex items-center justify-center w-screen h-screen text-gray-200 bg-slate-800">
+    <div class="container">
+      <h1 class="title">Stock-Liveview</h1>
+      <div class="prices" id="prices">
+        <div class="price-box">
           <span>No Stock Prices Found!</span>
         </div>
       </div>
