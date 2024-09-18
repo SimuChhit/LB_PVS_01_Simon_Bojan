@@ -157,6 +157,8 @@ services:
       MONGODB_COLLECTION: stock
     networks:
       - mongo_cluster
+    ports:
+      - "8081:3000"
 
 
   nginx:
